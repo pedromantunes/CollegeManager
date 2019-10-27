@@ -20,7 +20,20 @@ namespace CollegeManager.Controllers
         // GET: Courses
         public async Task<ActionResult> Index()
         {
-            return View(await db.Courses.ToListAsync());
+            string query = @"SELECT 
+                 Courses.CourseId as CourseId,
+                 Courses.Title as Title,
+                 COUNT(Teachers.TeacherId) as TeacherCount,
+                 COUNT(Students.StudentId) as StudentCount
+            FROM Subjects
+                INNER JOIN Teachers ON(Subjects.SubjectId = Teachers.SubjectId)
+                LEFT JOIN Courses ON(Subjects.CourseId = Courses.CourseId)
+                LEFT JOIN Students ON(Subjects.SubjectId = Students.SubjectId)
+            GROUP BY Courses.Title, Courses.CourseId";
+
+            var course = await db.Database.SqlQuery<CourseViewModel>(query).ToListAsync();
+
+            return View(course);
         }
 
         // GET: Courses/Details/5

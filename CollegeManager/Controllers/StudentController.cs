@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Mvc;
 using CollegeManager.Data.Entities;
 using CollegeManager.Data.Persistance;
+using CollegeManager.ViewModel;
 
 namespace CollegeManager.Controllers
 {
@@ -30,7 +31,9 @@ namespace CollegeManager.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Student student = await db.Students.FindAsync(id);
+            Student student = await db.Students.Include(s=>s.Subject)
+                                            .Include(g=>g.Grades)
+                                            .FirstOrDefaultAsync(i => i.StudentId == id);
             if (student == null)
             {
                 return HttpNotFound();
@@ -41,8 +44,13 @@ namespace CollegeManager.Controllers
         // GET: Students/Create
         public ActionResult Create()
         {
-            ViewBag.SubjectId = new SelectList(db.Subjects, "Id", "Title");
-            return View();
+            var student = new Student
+            {
+                Birthday = DateTime.Today
+            };
+
+            ViewBag.SubjectId = new SelectList(db.Subjects, "SubjectId", "Title");
+            return View(student);
         }
 
         // POST: Students/Create
@@ -50,16 +58,25 @@ namespace CollegeManager.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,SubjectId,RegistrationNumber,Name,Birthday")] Student student)
+        public async Task<ActionResult> Create([Bind(Include = "SubjectId,RegistrationNumber,Name,Birthday")] StudentViewModel studentViewModel)
         {
-            if (ModelState.IsValid)
+            var student = new Student(studentViewModel.SubjectId, studentViewModel.RegistrationNumber, studentViewModel.Name, studentViewModel.Birthday);
+            try
             {
-                db.Students.Add(student);
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    db.Students.Add(student);
+                    await db.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                }
             }
+            catch (DataException /* dex */)
+            {
+                //Log the error (uncomment dex variable name and add a line here to write a log.
+                ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
+            }
+            PopulateSubjectsDropDownList(student.SubjectId);
 
-            ViewBag.SubjectId = new SelectList(db.Subjects, "Id", "Title", student.SubjectId);
             return View(student);
         }
 
@@ -75,7 +92,9 @@ namespace CollegeManager.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.SubjectId = new SelectList(db.Subjects, "Id", "Title", student.SubjectId);
+
+            ViewBag.SubjectId = new SelectList(db.Subjects, "SubjectId", "Title", student.SubjectId);
+
             return View(student);
         }
 
@@ -84,15 +103,22 @@ namespace CollegeManager.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,SubjectId,RegistrationNumber,Name,Birthday")] Student student)
+        public async Task<ActionResult> Edit([Bind(Include = "StudentId,SubjectId,RegistrationNumber,Name,Birthday")] StudentViewModel studentViewModel)
         {
+            var student = new Student(studentViewModel.SubjectId, studentViewModel.RegistrationNumber, studentViewModel.Name, studentViewModel.Birthday)
+            {
+                StudentId = studentViewModel.StudentId ?? default(int)
+            };
+
             if (ModelState.IsValid)
             {
                 db.Entry(student).State = EntityState.Modified;
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            ViewBag.SubjectId = new SelectList(db.Subjects, "Id", "Title", student.SubjectId);
+
+            ViewBag.SubjectId = new SelectList(db.Subjects, "SubjectId", "Title", studentViewModel.SubjectId);
+
             return View(student);
         }
 
@@ -129,6 +155,14 @@ namespace CollegeManager.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private void PopulateSubjectsDropDownList(object selectedSubject = null)
+        {
+            var subjectQuery = from d in db.Subjects
+                               orderby d.Title
+                               select d;
+            ViewBag.SubjectId = new SelectList(subjectQuery, "Subjectid", "Title", selectedSubject);
         }
     }
 }

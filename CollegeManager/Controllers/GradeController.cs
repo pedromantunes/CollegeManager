@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Mvc;
 using CollegeManager.Data.Entities;
 using CollegeManager.Data.Persistance;
+using CollegeManager.ViewModel;
 
 namespace CollegeManager.Controllers
 {
@@ -19,7 +20,13 @@ namespace CollegeManager.Controllers
         // GET: Grades
         public async Task<ActionResult> Index()
         {
-            return View(await db.Grades.ToListAsync());
+            string query = @"SELECT Subjects.Title as Subject, Grades.Value, GradeId FROM Grades
+                INNER JOIN Students ON(Grades.StudentId = Students.StudentId)
+                INNER JOIN Subjects ON(Subjects.SubjectId = Students.SubjectId)";
+
+            var grades = await db.Database.SqlQuery<GradeViewModel>(query).ToListAsync();
+
+            return View(grades);
         }
 
         // GET: Grades/Details/5

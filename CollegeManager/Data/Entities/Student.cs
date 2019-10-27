@@ -21,7 +21,7 @@ namespace CollegeManager.Data.Entities
             Birthday = birthday;
         }
 
-        public int StudentId { get; private set; }
+        public int StudentId { get; set; }
         public int SubjectId { get; private set; }
         public string RegistrationNumber { get; private set; }
         public ICollection<Grade> Grades { get; private set; }

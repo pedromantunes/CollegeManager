@@ -102,9 +102,10 @@ namespace CollegeManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "SubjectId,Title,CourseId")] SubjectViewModel subjectViewModel)
         {
-            var subject = new Subject(subjectViewModel.CourseId, subjectViewModel.Title);
-
-            subject.SubjectId = subjectViewModel.SubjectId ?? default(int);
+            var subject = new Subject(subjectViewModel.CourseId, subjectViewModel.Title)
+            {
+                SubjectId = subjectViewModel.SubjectId ?? default(int)
+            };
 
             if (ModelState.IsValid)
             {

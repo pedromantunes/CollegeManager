@@ -1,7 +1,7 @@
-﻿@model IEnumerable<CollegeManager.Data.Entities.Course>
+﻿@model IEnumerable<CollegeManager.ViewModel.CourseViewModel>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Course";
 }
 
 <h2>Index</h2>
@@ -14,20 +14,33 @@
         <th>
             @Html.DisplayNameFor(model => model.Title)
         </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StudentCount)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.TeacherCount)
+        </th>
         <th></th>
     </tr>
 
 @foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Title)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.CourseId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.CourseId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.CourseId })
-        </td>
-    </tr>
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.Title)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.StudentCount)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.StudentCount)
+    </td>
+    <td>
+        @Html.ActionLink("Edit", "Edit", new { id = item.CourseId }) |
+        @Html.ActionLink("Details", "Details", new { id = item.CourseId }) |
+        @Html.ActionLink("Delete", "Delete", new { id = item.CourseId })
+    </td>
+</tr>
 }
 
 </table>

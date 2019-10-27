@@ -44,8 +44,14 @@ namespace CollegeManager.Controllers
         // GET: Teachers/Create
         public ActionResult Create()
         {
+            var teacher = new Teacher
+            {
+                Birthday = DateTime.Today
+            };
+
             ViewBag.SubjectId = new SelectList(db.Subjects, "SubjectId", "Title");
-            return View();
+
+            return View(teacher);
         }
 
         // POST: Teachers/Create
@@ -55,7 +61,7 @@ namespace CollegeManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "SubjectId,Salary,Name,Birthday")] TeacherViewModel teacherViewModel)
         {
-            var teacher = new Teacher(teacherViewModel.Name, teacherViewModel.Birthday, teacherViewModel.Salaray, teacherViewModel.SubjectId);
+            var teacher = new Teacher(teacherViewModel.Name, teacherViewModel.Birthday, teacherViewModel.Salary, teacherViewModel.SubjectId);
 
             try
             {
@@ -87,6 +93,7 @@ namespace CollegeManager.Controllers
             {
                 return HttpNotFound();
             }
+            ViewBag.SubjectId = new SelectList(db.Subjects, "SubjectId", "Title", teacher.SubjectId);
             return View(teacher);
         }
 
@@ -97,7 +104,7 @@ namespace CollegeManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "TeacherId,Salary,Name,Birthday, SubjectId")] TeacherViewModel teacherViewModel)
         {
-            var teacher = new Teacher(teacherViewModel.Name, teacherViewModel.Birthday, teacherViewModel.Salaray, teacherViewModel.SubjectId)
+            var teacher = new Teacher(teacherViewModel.Name, teacherViewModel.Birthday, teacherViewModel.Salary, teacherViewModel.SubjectId)
             {
                 TeacherId = teacherViewModel.TeacherId ?? default(int)
             };
@@ -109,7 +116,7 @@ namespace CollegeManager.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.SubjectId = new SelectList(db.Courses, "SubjectId", "Title", teacherViewModel.SubjectId);
+            ViewBag.SubjectId = new SelectList(db.Subjects, "SubjectId", "Title", teacherViewModel.SubjectId);
 
             return View(teacher);
         }

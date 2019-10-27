@@ -1,7 +1,7 @@
-﻿@model IEnumerable<CollegeManager.Data.Entities.Grade>
+﻿@model IEnumerable<CollegeManager.ViewModel.GradeViewModel>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Grade";
 }
 
 <h2>Index</h2>
@@ -12,7 +12,7 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.StudentId)
+            @Html.DisplayNameFor(model => model.Subject)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Value)
@@ -23,15 +23,14 @@
 @foreach (var item in Model) {
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.StudentId)
+            @Html.DisplayFor(modelItem => item.Subject)
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.Value)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Edit", "Edit", new { id=item.GradeId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.GradeId })
         </td>
     </tr>
 }

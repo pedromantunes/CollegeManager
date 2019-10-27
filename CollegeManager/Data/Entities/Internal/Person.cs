@@ -7,7 +7,7 @@ namespace CollegeManager.Data.Entities.Internal
 {
     public class Person
     {
-        public string Name { get; protected set; }
-        public DateTime Birthday { get; protected set; }
+        public string Name { get; set; }
+        public DateTime Birthday { get; set; }
     }
 }
